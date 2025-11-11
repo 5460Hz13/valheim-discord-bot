@@ -1,0 +1,106 @@
+{
+  "data": [
+    {"name": "Paperclip",    "category": "Office Supply", "description": "Small metal clip for holding papers"}, 
+    {"name": "Cactus", "category": "Plant", "description": "Spiky desert plant"},
+    {"name": "Drone", "category": "Technology", "description": "Remote-controlled flying device"},
+    {"name": "Maraca", "category": "Musical Instrument", "description": "Percussion instrument with beads inside" },
+    {"name": "Lava Lamp", "category": "Decor", "description": "Lamp with floating wax blobs"},
+    {"name": "Umbrella", "category": "Accessory", "description": "Used for protection from rain"},
+    {"name": "Skateboard", "category": "Sports", "description": "Wheeled board for riding"},
+  {
+  "name": "Stapler", "category": "Office Supply", "description": "Device for binding papers together"
+  },
+  {
+  "name": "Kiwi", "category": "Fruit", "description": "Fuzzy brown fruit with green flesh" },
+  {"name": "Telescope", "category": "Scientific Tool", "description": "Device for viewing distant objects"
+  },
+  {
+  "name": "Yo-yo", "category": "Toy", "description": "Spinning toy on a string"},
+  {"name": "Chessboard", "category": "Game", "description": "Board for playing chess"
+  },
+  {
+  "name": "Flashlight", "category": "Tool", "description": "Portable light source"
+  },
+  {
+  "name": "Paintbrush", "category": "Art Supply", "description": "Tool for applying paint" },
+  {"name": "Mug", "category": "Kitchenware", "description": "Cup for hot beverages"
+  },
+  {
+  "name": "Seashell", "category": "Nature", "description": "Hard shell from marine mollusk"},
+  {"name": "Magnet", "category": "Physics", "description": "Object that attracts iron"
+  },
+  {
+  "name": "Pillow", "category": "Bedding", "description": "Soft cushion for sleeping"
+  },
+  {
+  "name": "Compass", "category": "Navigation", "description": "Tool for finding direction" },
+  {"name": "Guitar Pick", "category": "Music", "description": "Small tool for strumming guitar"
+  },
+  {
+  "name": "Ice Cube Tray", "category": "Kitchenware", "description": "Mold for freezing water"},
+  {"name": "Sandpaper", "category": "Tool", "description": "Abrasive paper for smoothing surfaces"
+  },
+  {
+  "name": "Sunglasses", "category": "Accessory", "description": "Eyewear for sun protection"
+  },
+  {
+  "name": "Towel", "category": "Bathroom", "description": "Cloth for drying" },
+  {"name": "Matchstick", "category": "Firestarter", "description": "Small stick for lighting fires"
+  },
+  {
+  "name": "Globe", "category": "Educational", "description": "Model of Earth"},
+  {"name": "Zipper", "category": "Clothing", "description": "Fastener for garments"
+  },
+  {
+  "name": "Toothbrush", "category": "Hygiene", "description": "Tool for cleaning teeth"
+  },
+  {
+  "name": "Slingshot", "category": "Toy", "description": "Y-shaped tool for launching objects" },
+  {"name": "Corkscrew", "category": "Kitchen Tool", "description": "Tool for opening wine bottles"
+  },
+  {
+  "name": "Binoculars", "category": "Optics", "description": "Device for seeing distant objects"},
+  {"name": "Eraser", "category": "Stationery", "description": "Removes pencil marks"
+  },
+  {
+  "name": "Pinecone", "category": "Nature", "description": "Seed-bearing structure from pine trees"
+  },
+  {
+  "name": "Stopwatch", "category": "Timing Device", "description": "Measures elapsed time" },
+  {"name": "Frisbee", "category": "Toy", "description": "Flying disc for games"
+  },
+  {
+  "name": "Candle", "category": "Decor", "description": "Wax stick with wick for lighting"},
+  {"name": "Screwdriver", "category": "Tool", "description": "Used for turning screws"
+  },
+  {
+  "name": "Cookie Cutter", "category": "Kitchen Tool", "description": "Shapes dough into designs"
+  },
+  {
+  "name": "Thermometer", "category": "Scientific Tool", "description": "Measures temperature" },
+  {"name": "Backpack", "category": "Accessory", "description": "Bag worn on the back"
+  },
+  {
+  "name": "Nail Polish", "category": "Cosmetic", "description": "Colored lacquer for fingernails"},
+  {"name": "Dice", "category": "Game", "description": "Cubes with numbered sides"
+  },
+  {
+  "name": "Leaf", "category": "Nature", "description": "Part of a plant"
+  },
+  {
+  "name": "Helmet", "category": "Safety Gear", "description": "Protective headwear" },
+  {"name": "Whistle", "category": "Sound Device", "description": "Produces a sharp sound"
+  },
+  {
+  "name": "Lantern", "category": "Lighting", "description": "Portable light source"},
+  {"name": "Notebook", "category": "Stationery", "description": "Book for writing notes"
+  },
+  {
+  "name": "Feather", "category": "Nature", "description": "Light structure from birds"
+  },
+  {
+  "name": "Keychain", "category": "Accessory", "description": "Holds keys together" },
+  {"name": "Bubble Wrap", "category": "Packaging", "description": "Padded plastic for protection"
+  }]
+}
+
