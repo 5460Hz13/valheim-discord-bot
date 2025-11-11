@@ -1,7 +1,4 @@
-﻿
-
-
-//fix import
+﻿//fix import
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
@@ -16,7 +13,7 @@ import { GameDig } from 'gamedig';
 
 //setup dc
 import { REST, Routes } from 'discord.js';
-const { clientId, guildId, token, serverList_channelId, myServerIp, adminName, password } = require('./config.json');
+const { clientId, guildId, token, serverList_channelId, myServerIp, statusMsgId, adminName, password } = require('./config.json');
 
 //set commands
 const commands = [
@@ -29,6 +26,8 @@ const commands = [
         description: 'Attempts to give back Status',
     }
 ];
+
+
 
 //update commands
 const rest = new REST({ version: '10' }).setToken(token);
@@ -49,7 +48,15 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 
 //update status message with server status info
 function StartUpdates(msg) {
-    function GetStatusUpdate() {
+    //new message to update
+    if(!statusMsgId){
+        const statusMsgId = msg.id;
+    }
+    //fetch s message to update
+    else
+        msg.id = statusMsgId;
+    
+        function GetStatusUpdate() {
         //get status
         return GameDig.query({
             type: 'valheim',
@@ -79,8 +86,7 @@ function StartUpdates(msg) {
                     > bot by ${adminName}`,
                 })                
             }
-        })
-            .catch(err => console.log(err))
+        }).catch(err => console.log(err))
     }
     
     const getStatus = setInterval(GetStatusUpdate, 30000);
@@ -93,10 +99,24 @@ client.on(Events.ClientReady, readyClient => {
     client.channels.fetch(serverList_channelId)
         .then(channel => {
             if (channel.isTextBased()) {
-                channel.send({
-                    content: 'Preheating status message..',
-                    ephemeral: true
-                }).then(msg => (StartUpdates(msg)));
+                //make new message
+                if(!statusMsgId){
+                    channel.send({
+                        content: 'Preheating status message..',
+                        ephemeral: true
+                    })
+                        .then(msg => (StartUpdates(msg)));
+                }
+                //get prior message
+                else{
+                    channel.messages.edit(statusMsgId, {
+                        content: 'Rebooting data mines..',
+                        ephemeral: true,
+                    })
+                        .then(msg => (StartUpdates(msg)));
+
+                }
+                
             } else {
                 console.error('The channel is not a text-based channel.');
             }
@@ -113,7 +133,7 @@ client.on(Events.InteractionCreate, async interaction => {
         await interaction.reply('Pong!');
     }
     if (interaction.commandName === 'status') {
-        await interaction.reply("Find my status updates in [#server-list](<https://discord.com/channels/${guildId}/${serverList_channelId}>)");
+        await interaction.reply('Find my status updates in [#server-list](<'+'https://discord.com/channels/'+guildId+'/'+serverList_channelId+'>)');
     }
 });
 
