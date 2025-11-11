@@ -12,8 +12,14 @@ const __dirname = path1.dirname(__filename);
 import { GameDig } from 'gamedig';
 
 //setup dc
-import { REST, Routes } from 'discord.js';
-const { clientId, guildId, token, serverList_channelId, myServerIp, statusMsgId, adminName, password } = require('./config.json');
+import {Message, REST, Routes} from 'discord.js';
+//required config
+const { clientId, guildId, token, serverList_channelId, myServerIp, adminName, password, dataSetFile} = require('./config.json');
+//optional config
+let statusMsgId = require('./config.json').statusMsgId;
+let riddleChannel;
+
+const dataSet = require(`./${dataSetFile}`);
 
 //set commands
 const commands = [
@@ -24,10 +30,15 @@ const commands = [
     {
         name: 'status',  
         description: 'Attempts to give back Status',
+    },
+    {
+        name: "riddle",
+        description: 'Poses a riddle.',
     }
 ];
 
-
+let riddle;
+let riddlePosed = false;
 
 //update commands
 const rest = new REST({ version: '10' }).setToken(token);
@@ -37,7 +48,7 @@ try {
 
     await rest.put(Routes.applicationCommands(clientId), { body: commands });
     
-    console.log(`Successfully reloaded ${commands.length} application (/) commands.`);
+    console.log(`Successfully reloaded ${commands.length} (/) commands.`);
 } catch (error) {
     console.error(error);
 }
@@ -48,14 +59,6 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 
 //update status message with server status info
 function StartUpdates(msg) {
-    //new message to update
-    if(!statusMsgId){
-        const statusMsgId = msg.id;
-    }
-    //fetch s message to update
-    else
-        msg.id = statusMsgId;
-    
         function GetStatusUpdate() {
         //get status
         return GameDig.query({
@@ -64,29 +67,31 @@ function StartUpdates(msg) {
             port: 2457,
             givenPortOnly: true,
             requestRules: false
-        }).catch((err) => {msg.edit({
-            content:`valheimserver is OFFLINE
-            pls contact ${adminName}`,
-
-        })}).then(status => {
+        }).then(status => {
             //update status
             if(!status) {
                 msg.edit({
                     content:
-                        `valheimserver is OFFLINE
-                        bot by ${adminName}`,
+                        `## valheimserver is OFFLINE
+                        ####bot by ${adminName}`,
                 })
             }
             else{
                 msg.edit({
-                    content: `valheimserver ***${status.name}*** is **ONLINE** with ${status.numplayers}/${status.maxplayers} Players 
+                    content: `### valheimserver ***${status.name}*** is **ONLINE** with ${status.numplayers}/${status.maxplayers} Players 
                     > **[Join using: steam://connect/${status.connect}?appid=${status.raw.appId}]** 
                     > *(just paste link into your browser and hit 'ok'. password is: ${password})* 
                     
-                    > bot by ${adminName}`,
+                    #### bot by ${adminName}
+                    #### Copyright © 2025 ${adminName}`,
                 })                
             }
-        }).catch(err => console.log(err))
+        }).catch(err => {
+            msg.edit({
+                content: `##valheimserver is OFFLINE
+                #### pls contact ${adminName}`,
+            })
+        })
     }
     
     const getStatus = setInterval(GetStatusUpdate, 30000);
@@ -102,19 +107,21 @@ client.on(Events.ClientReady, readyClient => {
                 //make new message
                 if(!statusMsgId){
                     channel.send({
-                        content: 'Preheating status message..',
-                        ephemeral: true
+                        content: '### Preheating status message..'
                     })
-                        .then(msg => (StartUpdates(msg)));
+                        //then(msg => (StartUpdates(msg)));
                 }
                 //get prior message
-                else{
-                    channel.messages.edit(statusMsgId, {
-                        content: 'Rebooting data mines..',
-                        ephemeral: true,
+                else {
+                    //let getMsg = channel.messages.fetch(statusMsgId)
+                    channel.messages.fetch(statusMsgId).then(old_message =>  {
+                        old_message.edit({
+                            content: '### Rebooting data mines..',
+                            
+                        })
+                        return old_message
                     })
-                        .then(msg => (StartUpdates(msg)));
-
+                    .then(old_message => (StartUpdates(old_message)))
                 }
                 
             } else {
@@ -125,18 +132,63 @@ client.on(Events.ClientReady, readyClient => {
 });
 
 
-//react
+//react to commands
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
-
     if (interaction.commandName === 'ping') {
         await interaction.reply('Pong!');
     }
     if (interaction.commandName === 'status') {
-        await interaction.reply('Find my status updates in [#server-list](<'+'https://discord.com/channels/'+guildId+'/'+serverList_channelId+'>)');
+        await interaction.reply('Find my status updates in [#server-list](https://discord.com/channels/'+guildId+'/'+serverList_channelId+')');
+    }
+    if(interaction.commandName === 'riddle') {
+        if(!riddlePosed){
+            //select riddle
+            riddle = dataSet.data[Math.floor(Math.random()*dataSet.data.length)];
+            console.log(riddle.name+" has been chosen as riddle to solve")
+            //pose riddle
+            riddlePosed = true;
+            riddleChannel = interaction.channelId;
+            await interaction.reply(`## I pose to thee, a question mighty. Name me some ${riddle.description.toLowerCase()} or else, I'll smite yee!`)
+        }
+        else if(riddlePosed) {
+            await interaction.reply("### Im not gonna repeat myself! " +
+                "**GUESS** **you fool!**");
+            
+        }
+        else{
+            await interaction.reply(`Not what I expected, Mr. Frodo!`);
+        }
+        
     }
 });
 
+//listen for messages
+client.on(Events.MessageCreate, (message) => {
+
+    //riddle running? 
+    if(riddlePosed){
+        
+        //wrong channel?
+        if(message.channelId === riddleChannel){
+            
+            if(message.content.toLowerCase().includes(riddle.name.toLowerCase())){
+                message.reply({
+                    content: `YARRRRR! ${message.author.username} has solved my decrepit riddle! Try it again sometime, test your strength!`,
+                    
+                })
+                //right answer
+                console.log("riddle solved, resetting riddle");
+                riddlePosed = false;
+            }
+            else{
+                
+                //wrong answer
+                //console.log("wrong answer");
+            }
+        }
+    }
+})
 
 client.login(token);
 

@@ -1,0 +1,10 @@
+﻿{
+  "data": [
+    {"name": "Paperclip",    "category": "Office Supply", "description": "Small metal clip for holding papers"},
+    {"name": "Cactus", "category": "Plant", "description": "Spiky desert plant"},
+    {"name": "Drone", "category": "Technology", "description": "Remote-controlled flying device"},
+    {"name": "Maraca", "category": "Musical Instrument", "description": "Percussion instrument with beads inside" },
+    {"name": "Lava Lamp", "category": "Decor", "description": "Lamp with floating wax blobs"},
+    {"name": "Umbrella", "category": "Accessory", "description": "Used for protection from rain"},
+    {"name": "Skateboard", "category": "Sports", "description": "Wheeled board for riding"}]
+}
