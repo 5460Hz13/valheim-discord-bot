@@ -11,15 +11,24 @@ const __dirname = path1.dirname(__filename);
 //init gamedig for statusqueries
 import { GameDig } from 'gamedig';
 
+const gamedigRefreshTimer = 30000;
+
 //setup dc
 import {Message, REST, Routes} from 'discord.js';
-//required config
-const { clientId, guildId, token, serverList_channelId, myServerIp, adminName, password, dataSetFile} = require('./config.json');
-//optional config
-let statusMsgId = require('./config.json').statusMsgId;
-let riddleChannel;
 
+//required config
+const { clientId, guildId, token, serverList_channelId, myServerIp, dataSetFile, serverAdmin} = require('./config.json');
+
+const sysmsg = require("./config.json").messages;
+
+const valheim = require("./config.json").servers.valheim;
+const enshrouded = require("./config.json").servers.enshrouded;
+
+//riddle (optional)
+let riddleChannel;
 const dataSet = require(`./${dataSetFile}`);
+
+
 
 //set commands
 const commands = [
@@ -58,13 +67,50 @@ import { Client, Events, GatewayIntentBits } from 'discord.js';
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 //update status message with server status info
-function StartUpdates(msg) {
+function StartValheimServerUpdate(msg) {
         function GetStatusUpdate() {
         //get status
         return GameDig.query({
             type: 'valheim',
-            host: `${myServerIp}`,
-            port: 2457,
+            host: valheim.ip,
+            port: valheim.port,
+            givenPortOnly: true,
+            requestRules: false
+        }).then(status => {
+            //update status
+            if(!status) {
+                msg.edit({
+                    content: `## valheimserver is OFFLINE
+                    ####bot by ${serverAdmin}`,
+                })
+            }
+            else{
+                msg.edit({
+                    content: `### valheimserver ***${status.name}*** is **ONLINE** with ${status.numplayers}/${status.maxplayers} Players 
+                    > **[Join using: steam://connect/${status.connect}?appid=${status.raw.appId}]** 
+                    > *(just paste link into your browser and hit 'ok'. password is: ${valheim.password})* 
+                    
+                    bot by ${serverAdmin}
+                    `,
+                })                
+            }
+        }).catch(err => {
+            msg.edit({
+                content: `##valheimserver is OFFLINE
+                #### pls contact ${serverAdmin}`,
+            })
+        })
+    }
+    const getValheimStatus = setInterval(GetStatusUpdate, gamedigRefreshTimer);
+}
+
+function StartEnshroudedServerUpdate(msg) {
+    function GetStatusUpdate() {
+        //get status
+        return GameDig.query({
+            type: 'enshrouded',
+            host: enshrouded.ip,
+            port: enshrouded.port,
             givenPortOnly: true,
             requestRules: false
         }).then(status => {
@@ -72,29 +118,27 @@ function StartUpdates(msg) {
             if(!status) {
                 msg.edit({
                     content:
-                        `## valheimserver is OFFLINE
-                        ####bot by ${adminName}`,
+                        `## enshroudedserver is OFFLINE
+                        bot by ${serverAdmin}`,
                 })
             }
             else{
                 msg.edit({
-                    content: `### valheimserver ***${status.name}*** is **ONLINE** with ${status.numplayers}/${status.maxplayers} Players 
-                    > **[Join using: steam://connect/${status.connect}?appid=${status.raw.appId}]** 
-                    > *(just paste link into your browser and hit 'ok'. password is: ${password})* 
+                    content: `### enshroudedserver ***${status.name}*** is **ONLINE** with ${status.numplayers}/${status.maxplayers} Players 
+                    > text ${enshrouded.admin} if you want to join.
                     
-                    #### bot by ${adminName}
-                    #### Copyright © 2025 ${adminName}`,
-                })                
+                    bot by ${serverAdmin}`
+                })
             }
         }).catch(err => {
             msg.edit({
-                content: `##valheimserver is OFFLINE
-                #### pls contact ${adminName}`,
+                content: `##enshroudedserver is OFFLINE
+                pls contact ${serverAdmin}`,
             })
         })
     }
-    
-    const getStatus = setInterval(GetStatusUpdate, 30000);
+
+    const getEnshroudedStatus = setInterval(GetStatusUpdate, gamedigRefreshTimer);
 }
 
 
@@ -104,24 +148,42 @@ client.on(Events.ClientReady, readyClient => {
     client.channels.fetch(serverList_channelId)
         .then(channel => {
             if (channel.isTextBased()) {
-                //make new message
-                if(!statusMsgId){
+               
+                
+                //valheim server
+                if(!valheim.statusMsgId){
+                    //make new message
                     channel.send({
-                        content: '### Preheating status message..'
+                        content: sysmsg.new_msg
                     })
-                        //then(msg => (StartUpdates(msg)));
                 }
-                //get prior message
                 else {
-                    //let getMsg = channel.messages.fetch(statusMsgId)
-                    channel.messages.fetch(statusMsgId).then(old_message =>  {
+                    //get prior message
+                    channel.messages.fetch(valheim.statusMsgId).then(old_message =>  {
                         old_message.edit({
-                            content: '### Rebooting data mines..',
-                            
-                        })
+                            content: sysmsg.old_msg})
                         return old_message
                     })
-                    .then(old_message => (StartUpdates(old_message)))
+                        //start query
+                        .then(old_message => (StartValheimServerUpdate(old_message)))
+                }
+
+                //enshrouded server
+                if(!enshrouded.statusMsgId){
+                    //new message
+                    channel.send({
+                        content: sysmsg.new_msg
+                    }).then(new_message => {})
+                }
+                else {
+                    //old message
+                    channel.messages.fetch(enshrouded.statusMsgId).then(old_message => {
+                        old_message.edit({
+                            content: sysmsg.old_msg})
+                        return old_message
+                    })
+                        //start query
+                        .then(old_message => (StartEnshroudedServerUpdate(old_message)))
                 }
                 
             } else {
